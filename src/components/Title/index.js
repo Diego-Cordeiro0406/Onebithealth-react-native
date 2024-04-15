@@ -1,11 +1,27 @@
 import React from "react";
 
-import { View, Text } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 
 export default function Title() {
   return (
-    <View>
-      <Text>OneBitHealth</Text>
+    <View style={styles.titleContainer}>
+      <Text style={styles.textTitle}>ONEBITHEALTH</Text>
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  titleContainer: {
+    alignItems: 'center',
+    backgroundColor: '#E1E7E4',
+    flex: 1,
+    height: '25%',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  textTitle: {
+    color: '#FF0043',
+    fontSize: 24,
+    fontWeight: 'bold',
+  }
+});
