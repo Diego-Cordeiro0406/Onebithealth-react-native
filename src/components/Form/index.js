@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { StyleSheet ,View, TextInput, Text, Button, TouchableOpacity } from 'react-native'
+import {
+  StyleSheet ,
+  View,
+  TextInput,
+  Text,
+  Keyboard,
+  TouchableOpacity,
+} from 'react-native';
 
 import ResultImc from "./ResultImc";
 
@@ -7,24 +14,30 @@ export default function Form() {
   const [weight, setWeight] = useState(null);
   const [height, setHeight] = useState(null);
   const [appData, setappData] = useState({
-    resultMessage: 'Preencha o peso e altura',
+    resultMessage: '',
     result: null,
     textButton: 'Calcular'
   });
+  const [errorMessage, setErrorMessage] = useState(null);
+
+  const verficateFields = () => !appData.result && setErrorMessage('campo obrigatório*')
 
   const calculateImc = () => {
     if (height && weight) {
+      Keyboard.dismiss()
       setappData({
         result: (weight / (height * height)).toFixed(2),
-        resultMessage: 'Seu IMC é igual:',
+        resultMessage: 'Seu imc é igual:',
         textButton: 'Calcular Novamente',
-      })
+      });
+      setErrorMessage(null)
       setHeight(null)
       setWeight(null)
     } else {
+      verficateFields()
       setappData({
       result: null,
-      resultMessage: 'Preencha o peso e altura',
+      resultMessage: '',
       textButton: 'Calcular',
     })
     }
@@ -34,6 +47,7 @@ export default function Form() {
     <View style={ styles.formContainer }>
       <View style={ styles.infoContaIner }>
         <Text style={styles.labelText}>Altura</Text>
+        <Text style={styles.errorMessage}>{errorMessage}</Text>
         <TextInput
           onChangeText={setHeight}
           value={height}
@@ -44,6 +58,7 @@ export default function Form() {
       </View>
       <View style={ styles.infoContaIner }>
         <Text style={styles.labelText}>Peso</Text>
+        <Text style={styles.errorMessage}>{errorMessage}</Text>
         <TextInput
           onChangeText={setWeight}
           value={weight}
@@ -60,7 +75,11 @@ export default function Form() {
           <Text style={ styles.textButton }>{appData.textButton}</Text>
         </TouchableOpacity>
       </View>
-      <ResultImc result={appData.result} resultMessage={appData.resultMessage} />
+      {
+        appData.result && (
+          <ResultImc result={appData.result} resultMessage={appData.resultMessage} />
+        )
+      }
     </View>
   )
 }
@@ -91,7 +110,6 @@ const styles = StyleSheet.create({
   labelText: {
     fontSize: 18,
     marginLeft: 6,
-    // marginTop: 5,
     marginBottom: 5,
   },
   calculateButton: {
@@ -105,6 +123,11 @@ const styles = StyleSheet.create({
   textButton: {
     color: '#FFF',
     fontSize: 20
-
+  },
+  errorMessage: {
+    color: 'red',
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginLeft: 6,
   }
 });
