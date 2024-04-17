@@ -24,9 +24,10 @@ export default function Form() {
 
   const calculateImc = () => {
     if (height && weight) {
+      const heightFormat = height.replace(',', '.')
       Keyboard.dismiss()
       setappData({
-        result: (weight / (height * height)).toFixed(2),
+        result: (weight / (heightFormat * heightFormat)).toFixed(2),
         resultMessage: 'Seu imc é igual:',
         textButton: 'Calcular Novamente',
       });
