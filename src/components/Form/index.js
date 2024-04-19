@@ -6,6 +6,7 @@ import {
   Text,
   Keyboard,
   TouchableOpacity,
+  FlatList,
 } from 'react-native';
 
 import ResultImc from "./ResultImc";
@@ -19,6 +20,7 @@ export default function Form() {
     textButton: 'Calcular'
   });
   const [errorMessage, setErrorMessage] = useState(null);
+  const [historyData, setHistoryData] = useState([]);
 
   const verficateFields = () => !appData.result && setErrorMessage('campo obrigatório*')
 
@@ -26,11 +28,13 @@ export default function Form() {
     if (height && weight) {
       const heightFormat = height.replace(',', '.')
       Keyboard.dismiss()
+      const resultData = (weight / (heightFormat * heightFormat)).toFixed(2)
       setappData({
-        result: (weight / (heightFormat * heightFormat)).toFixed(2),
+        result: resultData,
         resultMessage: 'Seu imc é igual:',
         textButton: 'Calcular Novamente',
       });
+      setHistoryData((arr) => [...arr, {id: new Date().getTime(), imc: resultData}])
       setErrorMessage(null)
       setHeight(null)
       setWeight(null)
@@ -46,39 +50,60 @@ export default function Form() {
 
   return (
     <View style={ styles.formContainer }>
-      <View style={ styles.infoContaIner }>
-        <Text style={styles.labelText}>Altura</Text>
-        <Text style={styles.errorMessage}>{errorMessage}</Text>
-        <TextInput
-          onChangeText={setHeight}
-          value={height}
-          style={styles.input}
-          placeholder="ex. 1.70"
-          keyboardType="numeric"
-        />
-      </View>
-      <View style={ styles.infoContaIner }>
-        <Text style={styles.labelText}>Peso</Text>
-        <Text style={styles.errorMessage}>{errorMessage}</Text>
-        <TextInput
-          onChangeText={setWeight}
-          value={weight}
-          style={styles.input}
-          placeholder="ex. 90"
-          keyboardType="numeric"
-        />
-      </View>
-      <View style={ styles.infoContaIner }>
-        <TouchableOpacity
-          style={ styles.calculateButton }
-          onPress={calculateImc}
-        >
-          <Text style={ styles.textButton }>{appData.textButton}</Text>
-        </TouchableOpacity>
-      </View>
       {
-        appData.result && (
+        appData.result ? (
+        <View style={ styles.infoContaIner }>
           <ResultImc result={appData.result} resultMessage={appData.resultMessage} />
+          <TouchableOpacity
+              style={ styles.calculateButton }
+              onPress={calculateImc}
+          >
+            <Text style={ styles.textButton }>{appData.textButton}</Text>
+          </TouchableOpacity>
+          <View style={styles.listContainer}>
+            <Text style={styles.historyText}>Calculos recentes</Text>
+            <FlatList
+              data={historyData}
+              renderItem={({item}) => (
+                <Text style={styles.historyImcText}>{item.imc}</Text>)
+              }
+              keyExtractor={item => item.id}
+            />
+          </View>
+        </View>
+        ) : (
+        <View style={ styles.formContainer }>
+          <View style={ styles.infoContaIner }>
+            <Text style={styles.labelText}>Altura</Text>
+            <Text style={styles.errorMessage}>{errorMessage}</Text>
+            <TextInput
+              onChangeText={setHeight}
+              value={height}
+              style={styles.input}
+              placeholder="ex. 1.70"
+              keyboardType="numeric"
+            />
+          </View>
+          <View style={ styles.infoContaIner }>
+            <Text style={styles.labelText}>Peso</Text>
+            <Text style={styles.errorMessage}>{errorMessage}</Text>
+            <TextInput
+              onChangeText={setWeight}
+              value={weight}
+              style={styles.input}
+              placeholder="ex. 90"
+              keyboardType="numeric"
+            />
+          </View>
+          <View style={ styles.infoContaIner }>
+            <TouchableOpacity
+              style={ styles.calculateButton }
+              onPress={calculateImc}
+            >
+              <Text style={ styles.textButton }>{appData.textButton}</Text>
+            </TouchableOpacity>
+            </View>
+          </View>
         )
       }
     </View>
@@ -130,5 +155,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     marginLeft: 6,
+  },
+  listContainer: {
+    marginTop: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  historyText: {
+    color: '#FF0043',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  historyImcText : {
+    color: '#FF0043',
+    fontSize: 24,
+    fontWeight: 'bold',
   }
 });
